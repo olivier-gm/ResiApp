@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Mis publicaciones · ResiVe{% endblock %}
+{% block content %}
+<section class="container page-header" hx-history="false"><p class="eyebrow">MI ESPACIO</p><div class="section-heading"><h1>Mis publicaciones</h1><a class="button" href="{% url 'listings:new' %}">+ Publicar un inmueble</a></div><p>Administra tus espacios y mantén su disponibilidad actualizada.</p>
+  <form method="get" class="inline-form"><label for="status">Estado</label><select id="status" name="status"><option value="">Todos</option>{% for value,label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button type="submit" class="button button-secondary">Filtrar</button></form>
+  <div class="stack">{% for listing in listings %}<article class="card dashboard-row"><div><span class="badge">{{ listing.get_status_display }}</span><h2>{{ listing.title }}</h2><p>{{ listing.get_operation_display }} · {% if listing.amount %}{{ listing.amount }} {{ listing.currency }}{% else %}Precio por completar{% endif %}</p>{% if listing.moderation_reason %}<p class="notice">{{ listing.moderation_reason }}</p>{% endif %}</div><div><a class="button button-secondary" href="{% url 'listings:edit' listing.pk %}">Editar y administrar</a><a href="{{ listing.get_absolute_url }}">Vista previa</a></div></article>{% empty %}<div class="card empty-state"><h2>Aquí comienza tu próxima publicación</h2><p>Describe tu inmueble, añade fotos y envíalo a revisión.</p><a class="button" href="{% url 'listings:new' %}">Crear publicación</a></div>{% endfor %}</div>
+</section>
+{% endblock %}

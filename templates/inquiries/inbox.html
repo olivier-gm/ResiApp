@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Mis consultas · ResiVe{% endblock %}
+{% block content %}
+<section class="container section" hx-history="false">
+  <div class="section-heading"><div><p class="eyebrow">Mi espacio</p><h1>Mis consultas</h1><p>Conversa con la otra parte y coordina una visita.</p></div><a class="button secondary" href="{% url 'inquiries:inbox' %}">Actualizar bandeja</a></div>
+  <div class="stack">
+  {% for inquiry in inquiries %}
+    <article class="card panel"><h2><a href="{{ inquiry.get_absolute_url }}">{{ inquiry.listing.title }}</a></h2><p>Consulta iniciada el {{ inquiry.created_at|date:'d M Y' }} · Última actividad {{ inquiry.updated_at|date:'d M Y H:i' }}</p><a class="button secondary" href="{{ inquiry.get_absolute_url }}">Abrir conversación</a></article>
+  {% empty %}
+    <div class="empty-state"><h2>Tu próxima vivienda empieza con una conversación</h2><p>Cuando consultes un inmueble, podrás seguir la conversación aquí.</p><a class="button" href="/alquileres/">Buscar vivienda</a></div>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.sqlite3
+media/
+staticfiles/
+.runtime/
+test-results/
+.ruff_cache/
+.coverage
+.codebase-memory/
+node_modules/

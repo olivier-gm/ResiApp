@@ -1,0 +1,1 @@
+{% if google_oauth_enabled %}<form method="post" action="{% url 'accounts:google_start' %}" hx-boost="false" class="google-login">{% csrf_token %}<input type="hidden" name="next" value="{{ next|default:'' }}"><button type="submit" class="button secondary">Continuar con Google</button></form><p class="muted">O usa tu correo y contraseña.</p>{% endif %}

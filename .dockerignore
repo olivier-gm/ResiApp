@@ -1,0 +1,10 @@
+.git
+.venv
+.env
+.env.*
+.runtime
+media
+staticfiles
+*.sqlite3
+__pycache__
+test-results

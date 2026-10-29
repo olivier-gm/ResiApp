@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Conversación · ResiVe{% endblock %}
+{% block content %}
+<section class="container section" hx-history="false">
+  <p><a href="{% url 'inquiries:inbox' %}">← Mis consultas</a></p>
+  <div class="section-heading"><div><p class="eyebrow">Conversación privada</p><h1>{{ inquiry.listing.title }}</h1><p>Con {{ other.display_name|default:'Usuario de ResiVe' }}</p></div><a class="button secondary" href="{{ inquiry.get_absolute_url }}">Actualizar conversación</a></div>
+  {% if blocked %}<div class="notice">El contacto está bloqueado. El historial sigue disponible, pero no se pueden enviar mensajes ni cambiar visitas.</div>{% endif %}
+  {% if not user.email_verified %}<div class="notice">Verifica tu correo para responder.</div>{% endif %}
+  <div class="detail-layout">
+    <div class="stack">
+      <div class="panel message-list" aria-label="Mensajes">
+      {% for entry in thread_messages %}
+        <article class="message {% if entry.sender_id == user.pk %}message-own{% endif %}"><strong>{{ entry.sender.display_name|default:'Usuario de ResiVe' }}</strong><p>{{ entry.body|linebreaksbr }}</p><small>{{ entry.created_at|date:'d M Y · H:i' }}{% if entry.sender_id == user.pk and entry.read_at %} · Leído{% endif %}</small>{% if entry.sender_id != user.pk %}<p><a href="{% url 'moderation:report' %}?message={{ entry.pk }}">Denunciar mensaje</a></p>{% endif %}</article>
+      {% empty %}<p>Todavía no hay mensajes.</p>{% endfor %}
+      </div>
+      <form method="post" action="{% url 'inquiries:mark_read' inquiry.pk %}">{% csrf_token %}<button class="button secondary" type="submit">Marcar mensajes como leídos</button></form>
+      {% if not blocked and user.email_verified %}
+      <form method="post" action="{{ inquiry.get_absolute_url }}" class="panel stack">{% csrf_token %}<h2>Responder</h2>{{ message_form.as_p }}<button class="button" type="submit">Enviar mensaje</button></form>
+      {% endif %}
+      <div class="panel"><h2>Preferencias de contacto</h2><p>Bloquear impide nuevos mensajes y cambios de visitas entre estas dos cuentas.</p>
+      {% if blocked_by_me %}<form method="post" action="{% url 'inquiries:unblock' inquiry.pk %}">{% csrf_token %}<button class="button secondary" type="submit">Retirar mi bloqueo</button></form>
+      {% else %}<form method="post" action="{% url 'inquiries:block' inquiry.pk %}">{% csrf_token %}<button class="button secondary" type="submit">Bloquear contacto</button></form>{% endif %}</div>
+    </div>
+    <aside class="stack">
+      <div class="panel"><h2>Visitas</h2><p>Todos los horarios se muestran en Venezuela. Una visita no reserva el inmueble ni implica un pago.</p></div>
+      {% for visit in visits %}
+      <article class="panel"><p class="eyebrow">{{ visit.get_status_display }}</p><h3>{{ visit.scheduled_at|date:'d M Y · H:i' }}</h3><p>Propuesta de {{ visit.proposed_by.display_name|default:'Usuario de ResiVe' }}</p>
+        {% if response_visit.pk == visit.pk %}<div class="form-errors" role="alert">{{ response_form.errors }}</div>{% endif %}
+        {% if not blocked and user.email_verified and visit.status != 'cancelled' and visit.status != 'rejected' %}
+        <form method="post" action="{% url 'inquiries:visit_respond' visit.pk %}" class="stack">{% csrf_token %}<input type="hidden" name="version" value="{{ visit.version }}">
+          {% if visit.status == 'pending' and visit.proposed_by_id != user.pk %}<button class="button" type="submit" name="action" value="accept">Confirmar visita</button><button class="button secondary" type="submit" name="action" value="reject">Rechazar propuesta</button>{% endif %}
+          {% if response_visit.pk == visit.pk %}{{ response_form.scheduled_at.label_tag }}{{ response_form.scheduled_at }}{% else %}<label for="reschedule-{{ visit.pk }}">Proponer otro horario</label><input id="reschedule-{{ visit.pk }}" type="datetime-local" name="scheduled_at">{% endif %}<button class="button secondary" type="submit" name="action" value="reschedule">Enviar nuevo horario</button>
+          <button class="button secondary" type="submit" name="action" value="cancel">Cancelar visita</button>
+        </form>{% endif %}
+      </article>
+      {% empty %}<div class="panel"><p>Aún no han coordinado una visita.</p></div>{% endfor %}
+      {% if not blocked and user.email_verified %}<form method="post" action="{% url 'inquiries:visit_create' inquiry.pk %}" class="panel stack">{% csrf_token %}<h2>Proponer visita</h2>{{ visit_form.as_p }}<button class="button" type="submit">Enviar propuesta</button></form>{% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

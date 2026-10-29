@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a> &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo; {{ title }}</div>
+{% endblock %}
+{% block content %}
+<p>La decisión y el motivo se guardarán en el historial. El anunciante podrá consultar el motivo para corregir la información o solicitar una revisión.</p>
+<h2>Publicaciones seleccionadas</h2><ul>{% for listing in queryset %}<li>{{ listing.title }} · {{ listing.get_status_display }}</li>{% endfor %}</ul>
+<form method="post">{% csrf_token %}<input type="hidden" name="action" value="{{ action }}"><input type="hidden" name="apply" value="1"><input type="hidden" name="select_across" value="0">
+{% for listing in queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="{{ listing.pk }}">{% endfor %}
+{{ form.as_p }}<div class="submit-row"><input type="submit" value="Confirmar decisión"><a href="{% url opts|admin_urlname:'changelist' %}" class="closelink">Cancelar</a></div></form>
+{% endblock %}

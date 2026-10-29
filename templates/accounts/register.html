@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Crea tu cuenta · ResiVe{% endblock %}
+{% block content %}
+<section class="auth-layout"><div class="auth-intro"><span class="eyebrow">UN ESPACIO PARA CONECTAR</span><h1>Encuentra un lugar para tu nueva etapa.</h1><p>Una sola cuenta para buscar vivienda y publicar tus inmuebles en Venezuela.</p></div><div class="card auth-card"><h2>Crea tu cuenta</h2>{% include 'accounts/google_button.html' %}<form method="post">{% csrf_token %}{{ form.as_p }}<p class="muted">Recibirás un enlace para verificar tu correo antes de publicar o contactar.</p><button class="button" type="submit">Crear cuenta</button></form><p>¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Entra aquí</a></p></div></section>
+{% endblock %}

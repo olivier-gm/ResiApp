@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Mis favoritos · ResiVe{% endblock %}
+{% block content %}
+<section class="container page-header" hx-history="false"><p class="eyebrow">TUS ESPACIOS GUARDADOS</p><h1>Mis favoritos</h1><p>Vuelve a esos lugares que te hicieron imaginar una nueva etapa.</p><div class="property-grid">{% for item in items %}{% if item.listing.is_public %}{% include 'listings/card.html' with listing=item.listing %}{% else %}<article class="card empty-state"><h2>Inmueble no disponible</h2><p>Esta publicación ya no está visible.</p></article>{% endif %}{% empty %}<div class="card empty-state"><h2>Tu lista empieza aquí</h2><p>Guarda inmuebles desde su página para encontrarlos después.</p><a class="button" href="{% url 'listings:rentals' %}">Explorar alquileres</a></div>{% endfor %}</div></section>
+{% endblock %}

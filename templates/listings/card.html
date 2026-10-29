@@ -1,0 +1,12 @@
+<article class="property-card card">
+  <a class="property-photo" href="{{ listing.get_absolute_url }}" aria-label="Ver {{ listing.title }}">
+    {% if listing.cover %}<img src="{{ listing.cover.thumbnail_url }}" alt="{{ listing.cover.alt|default:listing.title }}" width="640" height="440" loading="lazy">{% else %}<div class="photo-placeholder" aria-hidden="true">⌂</div>{% endif %}
+    <span class="badge">{{ listing.get_operation_display }}</span>
+  </a>
+  <div class="property-body">
+    <p class="property-price">{{ listing.amount|floatformat:"2g" }} {{ listing.currency }} {% if listing.operation == 'rent' %}<span>/ mes</span>{% endif %}</p>
+    <h3><a href="{{ listing.get_absolute_url }}">{{ listing.title }}</a></h3>
+    <p class="muted">{% if listing.zone %}{{ listing.zone }}, {% endif %}{{ listing.locality.name }} · {{ listing.locality.state }}</p>
+    <div class="property-specs"><span>{{ listing.bedrooms }} hab.</span><span>{{ listing.bathrooms }} baños</span><span>{{ listing.area|floatformat:"0g" }} m²</span></div>
+  </div>
+</article>

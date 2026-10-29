@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Consultar inmueble · ResiVe{% endblock %}
+{% block content %}
+<section class="container section narrow" hx-history="false">
+  <p class="eyebrow">Da el siguiente paso</p><h1>Consulta por {{ listing.title }}</h1>
+  <p>Tu mensaje será privado entre tú y el anunciante. Evita compartir documentos, datos bancarios o información sensible.</p>
+  {% if not user.email_verified %}<div class="notice">Verifica tu correo desde <a href="{% url 'accounts:profile' %}">Mi cuenta</a> antes de enviar una consulta.</div>{% endif %}
+  <form method="post" class="panel stack">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Enviar consulta</button></form>
+  <p><a href="{{ listing.get_absolute_url }}">Volver al inmueble</a></p>
+</section>
+{% endblock %}

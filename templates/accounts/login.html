@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Entra a tu cuenta · ResiVe{% endblock %}
+{% block content %}
+<section class="auth-layout"><div class="auth-intro"><span class="eyebrow">TU PRÓXIMO HOGAR EMPIEZA AQUÍ</span><h1>Qué bueno verte de nuevo.</h1><p>Guarda los lugares que te gustan, conversa con anunciantes y organiza tus visitas.</p></div>
+<div class="card auth-card"><h2>Entra a ResiVe</h2>{% include 'accounts/google_button.html' %}<form method="post" hx-target="body" hx-select="unset" hx-push-url="true">{% csrf_token %}{{ form.as_p }}{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}<button class="button" type="submit">Entrar</button></form><p><a href="{% url 'accounts:password_reset' %}">Olvidé mi contraseña</a></p><p>¿Primera vez? <a href="{% url 'accounts:register' %}">Crea tu cuenta</a></p></div></section>
+{% endblock %}

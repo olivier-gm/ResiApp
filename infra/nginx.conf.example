@@ -1,0 +1,17 @@
+server {
+    listen 443 ssl;
+    server_name REPLACE_APP_DOMAIN;
+    # Configurar certificados con el proveedor de despliegue.
+    ssl_certificate /etc/ssl/resive/fullchain.pem;
+    ssl_certificate_key /etc/ssl/resive/privkey.pem;
+    client_max_body_size 9m;
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Sobrescribir, no aceptar IP arbitraria proporcionada por el cliente.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_read_timeout 60s;
+    }
+}

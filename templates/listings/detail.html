@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ listing.title }} · ResiVe{% endblock %}
+{% block content %}
+<section class="container page-header">
+  <a href="{% if listing.operation == 'rent' %}{% url 'listings:rentals' %}{% else %}{% url 'listings:sales' %}{% endif %}">← Volver a la búsqueda</a>
+  {% if not listing.is_public %}<p class="notice">Esta es una vista privada. Estado: {{ listing.get_status_display }}.</p>{% endif %}
+  <p class="eyebrow">{{ listing.get_property_type_display }} EN {{ listing.get_operation_display|upper }}</p>
+  <h1>{{ listing.title }}</h1>
+  <p class="muted">{% if listing.zone %}{{ listing.zone }}, {% endif %}{{ listing.locality.name }} · {{ listing.locality.state }}</p>
+</section>
+<div class="container detail-layout">
+  <div>
+    <div class="gallery">{% for photo in listing.images.all %}<a href="{{ photo.url }}" target="_blank" rel="noopener" hx-boost="false"><img src="{{ photo.url }}" alt="{{ photo.alt|default:listing.title }}" width="{{ photo.width }}" height="{{ photo.height }}" {% if not forloop.first %}loading="lazy"{% endif %}></a>{% empty %}<div class="photo-placeholder">Todavía no hay fotografías</div>{% endfor %}</div>
+    <section class="card detail-section"><h2>Así es este espacio</h2><div class="property-specs"><span>{{ listing.bedrooms }} dormitorios</span><span>{{ listing.bathrooms }} baños</span><span>{{ listing.parking }} estacionamientos</span><span>{{ listing.area|floatformat:"2g" }} m²</span></div><p>{{ listing.description|linebreaksbr }}</p></section>
+    <section class="card detail-section"><h2>Servicios y características</h2><p>Amueblado: {{ listing.furnished|yesno:'Sí,No,Sin informar' }} · Mascotas: {{ listing.pets_allowed|yesno:'Sí,No,Sin informar' }}</p><ul>{% for service in listing.amenities.all %}<li>{{ service }}</li>{% empty %}<li>El anunciante no ha detallado servicios adicionales.</li>{% endfor %}</ul></section>
+    <section class="card detail-section"><h2>Condiciones declaradas</h2>{% if listing.operation == 'rent' %}<dl>{% if listing.deposit != None %}<dt>Depósito</dt><dd>{{ listing.deposit }} {{ listing.currency }}</dd>{% endif %}{% if listing.advance != None %}<dt>Anticipo</dt><dd>{{ listing.advance }} {{ listing.currency }}</dd>{% endif %}{% if listing.minimum_months %}<dt>Estancia mínima</dt><dd>{{ listing.minimum_months }} meses</dd>{% endif %}{% if listing.available_from %}<dt>Disponible desde</dt><dd>{{ listing.available_from }}</dd>{% endif %}<dt>Incluido</dt><dd>{{ listing.included_expenses|default:'Sin informar' }}</dd><dt>Convivencia</dt><dd>{{ listing.house_rules|default:'Sin informar' }}</dd></dl>{% else %}<p>Precio {{ listing.negotiable|yesno:'negociable,no negociable' }}.</p><p>Documentación declarada: {{ listing.documentation|default:'Sin informar' }}.</p>{% endif %}<p>Gastos adicionales: {{ listing.additional_costs|default:'Sin informar' }}.</p><p class="muted">Confirma las condiciones directamente con el anunciante.</p></section>
+  </div>
+  <aside class="detail-sidebar">
+    <section class="card contact-card"><p class="property-price">{{ listing.amount|floatformat:"2g" }} {{ listing.currency }} {% if listing.operation == 'rent' %}<span>/ mes</span>{% endif %}</p><h2>{{ listing.owner.display_name }}</h2><p class="muted">Anunciante · {{ listing.owner.get_advertiser_type_display }}</p><p>Actualizado {{ listing.updated_at|date:'d M Y' }}</p>
+      {% if request.user.pk == listing.owner_id %}<a class="button" href="{% url 'listings:edit' listing.pk %}">Administrar publicación</a>{% endif %}
+      {% if listing.is_public %}{% include 'listings/favorite_button.html' %}{% if request.user.pk != listing.owner_id %}<a class="button" href="{% url 'inquiries:start' listing.pk %}">Consultar y coordinar visita</a>{% endif %}{% endif %}
+      {% if listing.is_public and listing.owner.whatsapp_url %}<a class="button button-outline" href="{{ listing.owner.whatsapp_url }}" target="_blank" rel="noopener noreferrer" hx-boost="false">Contactar por WhatsApp</a><p class="muted">El anunciante autorizó compartir su número para este contacto.</p>{% endif %}
+      <p class="muted">La ubicación mostrada es aproximada. Solicita detalles en una consulta privada.</p>
+    </section>
+    {% if listing.is_public %}<a href="{% url 'moderation:report' %}?listing={{ listing.pk }}">Reportar esta publicación</a>{% endif %}
+  </aside>
+</div>
+{% endblock %}

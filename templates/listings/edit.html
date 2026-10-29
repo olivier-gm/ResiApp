@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{% if listing_saved %}Editar publicación{% else %}Nueva publicación{% endif %} · ResiVe{% endblock %}
+{% block content %}
+<section class="container page-header narrow" hx-history="false">
+  <a href="{% url 'listings:dashboard' %}">← Mis publicaciones</a><p class="eyebrow">PUBLICO INMUEBLES</p><h1>{% if listing.title %}{{ listing.title }}{% else %}Cuéntanos sobre tu espacio{% endif %}</h1>
+  <p>Guarda primero la información. Después añade fotos y envía tu publicación a revisión.</p>
+  {% if listing.status == 'published' %}<p class="notice">Al guardar cambios o modificar fotos, la publicación se ocultará hasta una nueva revisión.</p>{% endif %}
+  {% if listing.moderation_reason %}<p class="notice">{{ listing.moderation_reason }}</p>{% endif %}
+  <form method="post" class="card form-card">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Guardar borrador</button></form>
+  {% if listing_saved %}
+    <section class="card detail-section"><h2>Fotografías</h2><p>Hasta 15 fotos de 8 MB. Primera foto: portada. No incluyas datos personales visibles.</p>
+      <form method="post" enctype="multipart/form-data" action="{% url 'listings:upload' listing.pk %}" hx-encoding="multipart/form-data">{% csrf_token %}{{ upload_form.as_p }}<button type="submit" class="button button-secondary">Añadir foto</button></form>
+      <div class="photo-editor">{% for photo in listing.images.all %}<article><img src="{{ photo.thumbnail_url }}" alt="{{ photo.alt|default:'Foto de la publicación' }}" width="320" height="220"><p>{% if forloop.first %}Portada{% else %}Foto {{ forloop.counter }}{% endif %}</p><form method="post" action="{% url 'listings:reorder_image' photo.pk %}">{% csrf_token %}<button name="direction" value="up" type="submit" class="button button-secondary" aria-label="Mover foto {{ forloop.counter }} antes">↑</button><button name="direction" value="down" type="submit" class="button button-secondary" aria-label="Mover foto {{ forloop.counter }} después">↓</button></form><form method="post" action="{% url 'listings:delete_image' photo.pk %}">{% csrf_token %}<button class="button button-secondary" type="submit">Eliminar foto</button></form></article>{% empty %}<p>Añade al menos una foto para solicitar revisión.</p>{% endfor %}</div>
+    </section>
+    <section class="card detail-section"><h2>Revisar y publicar</h2><p>Estado: <strong>{{ listing.get_status_display }}</strong></p><a href="{{ listing.get_absolute_url }}">Ver vista previa</a><form method="post" action="{% url 'listings:state' listing.pk %}">{% csrf_token %}{% if listing.status == 'draft' or listing.status == 'changes' or listing.status == 'paused' %}<button class="button" name="target" value="pending">Enviar a revisión</button>{% endif %}{% if listing.status == 'published' %}<button class="button button-secondary" name="target" value="paused">Pausar publicación</button>{% endif %}{% if listing.status == 'published' or listing.status == 'paused' %}<button class="button button-secondary" name="target" value="closed">Marcar como {% if listing.operation == 'rent' %}alquilada{% else %}vendida{% endif %}</button>{% endif %}{% if listing.status == 'pending' %}<button class="button button-secondary" name="target" value="draft">Volver a borrador</button>{% endif %}{% if listing.status == 'closed' %}<button class="button button-secondary" name="target" value="draft">Reabrir como borrador</button>{% endif %}</form></section>
+  {% endif %}
+</section>
+{% endblock %}

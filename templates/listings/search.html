@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{% if operation == 'rent' %}Alquileres{% else %}Inmuebles en venta{% endif %} · ResiVe{% endblock %}
+{% block content %}
+<section class="page-header container">
+  <p class="eyebrow">ENCUENTRA TU LUGAR</p>
+  <h1>{% if operation == 'rent' %}Un espacio para empezar tu próxima etapa.{% else %}Tu próximo hogar, a tu medida.{% endif %}</h1>
+  <div class="tabs"><a href="{% url 'listings:rentals' %}" {% if operation == 'rent' %}aria-current="page"{% endif %}>Alquilar</a><a href="{% url 'listings:sales' %}" {% if operation == 'sale' %}aria-current="page"{% endif %}>Comprar</a></div>
+</section>
+<div class="container search-layout">
+  <aside class="filter-panel card">
+    <details open><summary>Filtrar búsqueda</summary>
+      <form method="get" hx-get="{{ request.path }}" hx-target="#main" hx-select="#main" hx-swap="outerHTML" hx-push-url="true" hx-sync="this:replace">
+        <noscript><p>Elige un estado y pulsa Buscar para cargar sus ciudades. Después puedes elegir la ciudad y buscar de nuevo.</p></noscript>
+        {{ form.as_p }}
+        <button class="button" type="submit">Buscar inmuebles</button>
+        <a href="{{ request.path }}" class="button button-secondary">Limpiar filtros</a>
+      </form>
+    </details>
+  </aside>
+  <section aria-label="Resultados" class="results">
+    <div class="section-heading"><h2>{{ page_obj.paginator.count }} inmueble{{ page_obj.paginator.count|pluralize:"s" }}</h2><span class="muted">Actualizados por sus anunciantes</span></div>
+    <div class="property-grid">{% for listing in page_obj %}{% include 'listings/card.html' %}{% empty %}<div class="empty-state card"><h2>No encontramos coincidencias</h2><p>Prueba otra ciudad o amplía los filtros. Las nuevas publicaciones aparecerán aquí.</p><a href="{{ request.path }}">Limpiar la búsqueda</a></div>{% endfor %}</div>
+    {% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Páginas de resultados">{% if page_obj.has_previous %}<a class="button button-secondary" href="?{{ querystring }}&amp;page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}<span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="button button-secondary" href="?{{ querystring }}&amp;page={{ page_obj.next_page_number }}">Siguiente</a>{% endif %}</nav>{% endif %}
+  </section>
+</div>
+{% endblock %}

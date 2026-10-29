@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Denunciar contenido · ResiVe{% endblock %}
+{% block content %}
+<section class="container section narrow" hx-history="false"><p class="eyebrow">Ayúdanos a cuidar la comunidad</p><h1>Denunciar contenido</h1><p>Relacionado con {{ target_title }}</p><p>El equipo revisará este contenido y tu explicación. No incluyas documentos de identidad ni datos bancarios. Esta denuncia no se mostrará al anunciante ni al resto de usuarios.</p>
+<form method="post" class="panel stack">{% csrf_token %}<input type="hidden" name="listing" value="{{ listing_id }}"><input type="hidden" name="message" value="{{ message_id }}">{{ form.as_p }}<button class="button" type="submit">Enviar denuncia</button></form></section>
+{% endblock %}

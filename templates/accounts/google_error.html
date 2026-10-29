@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}Acceso con Google · ResiVe{% endblock %}{% block content %}<section class="form-card"><h1>Acceso con Google</h1><p role="alert">{{ error }}</p><p><a href="{% url 'accounts:login' %}">Volver a entrar</a> · <a href="{% url 'accounts:password_reset' %}">Recuperar o crear contraseña</a></p></section>{% endblock %}
